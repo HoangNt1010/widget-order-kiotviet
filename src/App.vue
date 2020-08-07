@@ -1,10 +1,10 @@
 <template>
   <div>
-    <!-- <button v-if="!isOAuth" class="auth btn btn-danger" @click="runOAuth()">
+    <button v-if="!isOAuth" class="auth btn btn-danger" @click="runOAuth()">
       Kích hoạt
     </button>
-    <div v-if="isOAuth"> -->
-    <div>
+    <div v-if="isOAuth">
+    <!-- <div> -->
       <div class="content">
         <div class="header px-1 py-2">
           <div class="content-header d-flex justify-content-between">
@@ -736,12 +736,7 @@ export default {
             `${host}/selling-page/order/order_kiotviet`,
             body
           );
-          if (!createBill) {
-            Toast.fire({
-              icon: "err",
-              title: "Vui lòng thử lại!",
-            });
-          } else {
+          
             this.phoneNumber = "";
             this.address = "";
             this.city = "";
@@ -753,7 +748,7 @@ export default {
               title: "Tạo đơn hàng thành công",
             });
             this.deleteAllCart();
-          }
+            this.cart();
         } catch (err) {
           Toast.fire({
             icon: "error",

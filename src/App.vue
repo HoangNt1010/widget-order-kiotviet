@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button v-if="!isOAuth" class="auth btn btn-danger" @click="runOAuth()">
+    <button v-if="!isOAuth" class="btn-auth btn btn-danger" @click="runOAuth()">
       Kích hoạt
     </button>
     <div v-if="isOAuth">
@@ -8,7 +8,7 @@
       <div class="content">
         <div class="header px-1 py-2">
           <div class="content-header d-flex justify-content-between">
-            <h5 class="p-1 py-2">Địa chỉ giao hàng</h5>
+            <h5 class="p-1">Địa chỉ giao hàng</h5>
             <button type="button" class="btn btn-primary" @click="reConfig()">
               Đặt lại store
             </button>
@@ -107,7 +107,7 @@
               @click="openModalAddCart"
             >
               <i class="fas fa-plus-circle"></i>
-              <span>Thêm sản phẩm</span>
+              <span> Thêm sản phẩm</span>
             </button>
             <div v-if="isShowModalProduct" class="modal-add-product">
               <button class="btn-close" @click="closeAddProduct()">
@@ -155,7 +155,7 @@
           <div class="btn-add-note">
             <button class="btn btn-primary" type="button" @click="openNote()">
               <i class="fas fa-poll-h"></i>
-              <span>Thêm ghi chú</span>
+              <span> Thêm ghi chú</span>
             </button>
           </div>
           <div v-if="isShowModalNote" class="modal-note">
@@ -167,19 +167,25 @@
                 v-model="note"
               ></textarea>
             </div>
-            <button type="button" class="btn btn-primary" @click="closeNote()">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              @click="closeNote()"
+            >
               Thêm
             </button>
           </div>
           <!-- modal-note -->
-          <table class="table my-2">
+          <table class="table mt-1">
             <tbody>
               <tr v-for="(item, index) in cart" :key="index">
-                <td>
+                <td class="pl-1">
                   <img :src="item.other_info || imageDefault" />
                 </td>
                 <td>
-                  <p>{{ item.product_name }}</p>
+                  <div>
+                    <p>{{ item.product_name }}</p>
+                  </div>
                 </td>
                 <td class="input-sort">
                   <div class="d-flex justify-content-start">
@@ -208,7 +214,7 @@
                   <p>{{ item.product_price * item.product_quantity }}đ</p>
                 </td>
                 <td>
-                  <div class="py-2">
+                  <div class="py-2 pr-1">
                     <i
                       class="fas fa-trash-alt"
                       @click="handleDeleteItemCart(item.product_id)"
@@ -234,7 +240,11 @@
         </div>
         <!-- bill -->
         <div class="footer d-flex flex-row-reverse mx-5">
-          <button type="button" class="btn btn-primary btn-block" @click="createBill()">
+          <button
+            type="button"
+            class="btn btn-primary btn-block btn-sm"
+            @click="createBill()"
+          >
             Tạo đơn hàng
           </button>
         </div>
@@ -263,13 +273,16 @@
           </div>
           <button
             type="button"
-            class="btn btn-primary btn-block"
+            class="btn btn-primary btn-block btn-sm"
             @click="getAccessToken()"
           >
             Xác nhận
           </button>
         </div>
-        <div v-if="checkStoreAndRetailer" class="modal-form-sync-product pt-3 px-2">
+        <div
+          v-if="checkStoreAndRetailer"
+          class="modal-form-sync-product pt-3 px-2"
+        >
           <div class="form-group input-group-sm">
             <label>Store Id:</label>
             <input
@@ -288,7 +301,11 @@
               v-model="retailer"
             />
           </div>
-          <button type="button" class="btn btn-primary btn-block" @click="syncProduct()">
+          <button
+            type="button"
+            class="btn btn-primary btn-block btn-sm"
+            @click="syncProduct()"
+          >
             Xác nhận
           </button>
         </div>
@@ -330,7 +347,7 @@ export default {
       imageDefault:
         "https://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png",
       fullName: "",
-      phoneNumber: 0,
+      phoneNumber: "",
       address: "",
       city: "",
       district: "",
@@ -359,7 +376,6 @@ export default {
     this.partnerAuthenticate();
     this.getCity();
     this.getBranch();
-    this.getProductCart();
     this.getCart();
   },
   mounted() {},
@@ -420,7 +436,6 @@ export default {
           this.isOAuth = true;
           this.fullName =
             get_customer_info.data.data.public_profile.client_name;
-          // this.phoneNumber =
         }
       } catch (error) {
         this.isOAuth = false;
@@ -429,45 +444,85 @@ export default {
     },
     // lấy accessTokenKioviet
     async getAccessToken() {
-      let params = {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-      };
-      try {
-        let accessToken = await Restful.get(
-          `${host}/selling-page/other/kiotviet_access_token`,
-          params
-        );
-        this.accessTokenKiotviet = accessToken.data.data.access_token;
-        localStorage.setItem("client_id", this.clientId);
-        localStorage.setItem("client_secret", this.clientSecret);
-        localStorage.setItem(
-          "access_token_kiotviet",
-          accessToken.data.data.access_token
-        );
-        this.checkIdAndSecret = false;
-        this.checkStoreAndRetailer = true;
-      } catch (err) {
-        console.log(err);
+      if (!this.clientId) {
+        Toast.fire({
+          icon: "error",
+          title: `Client Id chưa nhập thông tin`,
+        });
+      } else if (!this.clientSecret) {
+        Toast.fire({
+          icon: "error",
+          title: `Client Secret chưa nhập thông tin`,
+        });
+      } else {
+        let params = {
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
+        };
+        try {
+          let accessToken = await Restful.get(
+            `${host}/selling-page/other/kiotviet_access_token`,
+            params
+          );
+          this.accessTokenKiotviet = accessToken.data.data.access_token;
+          localStorage.setItem("client_id", this.clientId);
+          localStorage.setItem("client_secret", this.clientSecret);
+          localStorage.setItem(
+            "access_token_kiotviet",
+            accessToken.data.data.access_token
+          );
+          this.checkIdAndSecret = false;
+          this.checkStoreAndRetailer = true;
+          Toast.fire({
+            icon: "success",
+            title: "Thành công",
+          });
+        } catch (err) {
+          console.log(err);
+          Toast.fire({
+            icon: "error",
+            title: "Vui lòng thử lại",
+          });
+        }
       }
     },
-    // đồng bộ sản phẩm lên store
+    // đồng bộ sản phẩm với store
     async syncProduct() {
-      let params = {
-        store_id: this.storeId,
-        Retailer: this.retailer,
-        Authorization: localStorage.getItem("access_token_kiotviet"),
-      };
-      try {
-        let syncProduct = Restful.get(
-          `${host}/selling-page/product/sync_product_kiotviet`,
-          params
-        );
-        localStorage.setItem("store_id", this.storeId);
-        localStorage.setItem("retailer", this.retailer);
-        this.checkStoreAndRetailer = false;
-      } catch (err) {
-        console.log(err);
+      if (!this.storeId) {
+        Toast.fire({
+          icon: "error",
+          title: `Store Id chưa nhập thông tin`,
+        });
+      } else if (!this.retailer) {
+        Toast.fire({
+          icon: "error",
+          title: `Retailer chưa nhập thông tin`,
+        });
+      } else {
+        let params = {
+          store_id: this.storeId,
+          Retailer: this.retailer,
+          Authorization: localStorage.getItem("access_token_kiotviet"),
+        };
+        try {
+          let syncProduct = Restful.get(
+            `${host}/selling-page/product/sync_product_kiotviet`,
+            params
+          );
+          localStorage.setItem("store_id", this.storeId);
+          localStorage.setItem("retailer", this.retailer);
+          Toast.fire({
+            icon: "success",
+            title: "Thành công",
+          });
+          this.checkStoreAndRetailer = false;
+        } catch (err) {
+          console.log(err);
+          Toast.fire({
+            icon: "error",
+            title: "Vui lòng thử lại",
+          });
+        }
       }
     },
     // xác thực
@@ -482,12 +537,7 @@ export default {
           `${APIBase}/v1/app/app-installed/update`,
           body
         );
-        if (
-          Oauth &&
-          Oauth.data &&
-          Oauth.data.data &&
-          Oauth.data.data.app_installed
-        ) {
+        if (Oauth) {
           this.isOAuth = true;
           window.close();
         }
@@ -554,6 +604,7 @@ export default {
     },
     // mở modal thêm sp vào giỏ hàng
     openModalAddCart() {
+      this.getProductCart();
       this.isShowModalProduct = true;
     },
     // đóng modal thêm sp vào giỏ hàng
@@ -592,7 +643,6 @@ export default {
           `${host}/selling-page/cart/cart_add_product`,
           body
         );
-        console.log(addCart);
         Toast.fire({
           icon: "success",
           title: "Đã thêm vào giỏ hàng",
@@ -687,9 +737,7 @@ export default {
         console.log(err);
       }
     },
-    //tạo đơn hàng
     async createBill() {
-      let phoneNumber = this.phoneNumber.toString();
       let address =
         this.address +
         " " +
@@ -712,18 +760,40 @@ export default {
         Authorization: localStorage.getItem("access_token_kiotviet"),
         // platform_type: "kiotviet",
       };
-      if (
-        !this.fullName ||
-        !phoneNumber ||
-        !this.address ||
-        !this.city.name ||
-        !this.district.name ||
-        !this.ward ||
-        !this.branchId
-      ) {
+      if (!this.fullName) {
         Toast.fire({
           icon: "error",
-          title: "Vui lòng điền đủ thông tin",
+          title: `Họ và tên chưa nhập thông tin`,
+        });
+      } else if (!this.phoneNumber) {
+        Toast.fire({
+          icon: "error",
+          title: `Số điện thoại chưa nhập thông tin`,
+        });
+      } else if (!this.address) {
+        Toast.fire({
+          icon: "error",
+          title: `Địa chỉ chưa nhập thông tin`,
+        });
+      } else if (!this.branchId) {
+        Toast.fire({
+          icon: "error",
+          title: `Chi nhánh chưa nhập thông tin`,
+        });
+      } else if (!this.city.name) {
+        Toast.fire({
+          icon: "error",
+          title: `Tỉnh/Thành phố chưa nhập thông tin`,
+        });
+      } else if (!this.district.name) {
+        Toast.fire({
+          icon: "error",
+          title: `Quận/Huyện chưa nhập thông tin`,
+        });
+      } else if (!this.ward) {
+        Toast.fire({
+          icon: "error",
+          title: `Xã/Phường chưa nhập thông tin`,
         });
       } else if (this.cart.length === 0) {
         Toast.fire({
@@ -736,19 +806,18 @@ export default {
             `${host}/selling-page/order/order_kiotviet`,
             body
           );
-          
-            this.phoneNumber = "";
-            this.address = "";
-            this.city = "";
-            this.district = "";
-            this.ward = "";
-            this.branchId = "";
-            Toast.fire({
-              icon: "success",
-              title: "Tạo đơn hàng thành công",
-            });
-            this.deleteAllCart();
-            this.cart();
+          this.phoneNumber = "";
+          this.address = "";
+          this.city = "";
+          this.district = "";
+          this.ward = "";
+          this.branchId = "";
+          Toast.fire({
+            icon: "success",
+            title: "Tạo đơn hàng thành công",
+          });
+          this.deleteAllCart();
+          this.cart();
         } catch (err) {
           Toast.fire({
             icon: "error",
@@ -777,6 +846,11 @@ body {
   margin: 0;
   overflow-x: hidden;
   font-size: 13px;
+  .btn-auth {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+  }
   .content {
     .header {
       background-color: #dbd9d9;
@@ -784,11 +858,11 @@ body {
         h5 {
           font-size: 13px;
         }
-      }
-      i {
-        font-size: 13px;
-        color: black;
-        cursor: pointer;
+        button {
+          height: 30px;
+          font-size: 13px;
+          padding-top: 4px;
+        }
       }
     }
     .body {
@@ -825,7 +899,7 @@ body {
           height: 100%;
           width: 100%;
           cursor: pointer;
-          overflow-y: auto;
+          overflow-y: scroll;
           overflow-x: hidden;
           .row {
             margin-top: 5px;
@@ -849,6 +923,9 @@ body {
             }
           }
         }
+        .show-product::-webkit-scrollbar {
+          display: none;
+        }
       }
       .btn-add-note {
         display: inline-block;
@@ -870,29 +947,35 @@ body {
         tr {
           td {
             padding: 0;
+            margin: 0 2px;
             i {
+              margin-top: 5px;
               text-align: center;
               background-color: #dbd9d9;
               cursor: pointer;
-              font-size: 13px;
+              font-size: 14px;
             }
             p {
-              margin: 0;
+              margin: 6px 2px 0 2px;
+              padding: auto 0;
+              text-align: center;
             }
           }
         }
         img {
+          margin-top: 5px;
           width: 35px;
           height: 35px;
         }
         input {
+          margin-top: 5px;
           text-align: center;
           padding: 0;
           width: 32px;
           height: 32px;
         }
         i {
-          margin-top: 3px;
+          margin-top: 5px;
           margin-left: 1px;
           display: block;
         }
@@ -915,7 +998,6 @@ body {
       }
     }
   }
-
   .modal-get-info {
     position: fixed;
     left: 0;

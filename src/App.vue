@@ -1,17 +1,27 @@
 <template>
   <div>
-    <button v-if="!isOAuth" class="btn-auth btn btn-danger" @click="runOAuth()">
-      Kích hoạt
-    </button>
+    <div v-if="!isOAuth" class="auth">
+      <div class="form-group form-control-sm">
+        <label>Access token:</label>
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Access token"
+          v-model="accessTokenKiotviet"
+        />
+      </div>
+      <div class="mx-5">
+        <button class="btn btn-primary btn-block" @click="runOAuth()">
+          Kích hoạt
+        </button>
+      </div>
+    </div>
     <div v-if="isOAuth">
-    <!-- <div> -->
+      <!-- <div> -->
       <div class="content">
         <div class="header px-1 py-2">
           <div class="content-header d-flex justify-content-between">
             <h5 class="p-1">Địa chỉ giao hàng</h5>
-            <button type="button" class="btn btn-primary" @click="reConfig()">
-              Đặt lại store
-            </button>
           </div>
           <div class="form-row pt-2">
             <div class="col input-group-sm">
@@ -239,7 +249,7 @@
           </div>
         </div>
         <!-- bill -->
-        <div class="footer d-flex flex-row-reverse mx-5">
+        <div class="footer mx-5">
           <button
             type="button"
             class="btn btn-primary btn-block btn-sm"
@@ -251,65 +261,6 @@
         <!-- footer -->
       </div>
       <!-- content -->
-      <div v-if="!checkModal">
-        <div v-if="checkIdAndSecret" class="modal-get-info pt-3 px-2">
-          <div class="form-group input-group-sm">
-            <label>CLient Id:</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Client Id"
-              v-model="clientId"
-            />
-          </div>
-          <div class="form-group input-group-sm">
-            <label>Client Secret:</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Client Secret"
-              v-model="clientSecret"
-            />
-          </div>
-          <button
-            type="button"
-            class="btn btn-primary btn-block btn-sm"
-            @click="getAccessToken()"
-          >
-            Xác nhận
-          </button>
-        </div>
-        <div
-          v-if="checkStoreAndRetailer"
-          class="modal-form-sync-product pt-3 px-2"
-        >
-          <div class="form-group input-group-sm">
-            <label>Store Id:</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Store id"
-              v-model="storeId"
-            />
-          </div>
-          <div class="form-group input-group-sm">
-            <label>Retailer Id:</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Retailer id"
-              v-model="retailer"
-            />
-          </div>
-          <button
-            type="button"
-            class="btn btn-primary btn-block btn-sm"
-            @click="syncProduct()"
-          >
-            Xác nhận
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -339,11 +290,10 @@ export default {
       isOAuth: false,
       secret_key: "afc0e008b5d44efc9d689545bd1e2769",
       access_token: access_token,
-      storeId: "5f27b3e89e3fcd007754ef2c",
-      retailer: "tuonggodevuong",
-      accessTokenKiotviet: "",
-      clientId: "4b2ae4e1-f839-4d40-80fc-33dab03404fe",
-      clientSecret: "02335391567814387AD05C073C2AA268E1C53D5B",
+      token_partner: "",
+      clientId: "",
+      accessTokenKiotviet:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdG9yZV9pZCI6IjVmMmUyNzQ0ZGI1NGQ3MDBiNzY1ZDUwZiIsInBsYXRmb3JtX3R5cGUiOiJLSU9UVklFVCIsImFwaV9pbmZvIjp7IlJldGFpbGVyIjoidHVvbmdnb2RldnVvbmciLCJBdXRob3JpemF0aW9uIjoiZXlKaGJHY2lPaUpTVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnVZbVlpT2pFMU9UWTRPREV6T0RVc0ltVjRjQ0k2TVRVNU5qazJOemM0TlN3aWFYTnpJam9pYUhSMGNEb3ZMMmxrTG10cGIzUjJhV1YwTG5adUlpd2lZWFZrSWpwYkltaDBkSEE2THk5cFpDNXJhVzkwZG1sbGRDNTJiaTl5WlhOdmRYSmpaWE1pTENKTGFXOTBWbWxsZEM1QmNHa3VVSFZpYkdsaklsMHNJbU5zYVdWdWRGOXBaQ0k2SWpSaU1tRmxOR1V4TFdZNE16a3ROR1EwTUMwNE1HWmpMVE16WkdGaU1ETTBNRFJtWlNJc0ltTnNhV1Z1ZEY5U1pYUmhhV3hsY2tOdlpHVWlPaUowZFc5dVoyZHZaR1YyZFc5dVp5SXNJbU5zYVdWdWRGOVNaWFJoYVd4bGNrbGtJam9pTWpFNU1UUTFJaXdpWTJ4cFpXNTBYMVZ6WlhKSlpDSTZJak01TVRVM01DSXNJbU5zYVdWdWRGOVRaVzV6YVhScGRtVkJjR2tpT2lKVWNuVmxJaXdpYzJOdmNHVWlPbHNpVUhWaWJHbGpRWEJwTGtGalkyVnpjeUpkZlEud1ZYZTJwN3Z4RjRHYkpSdXM0V2JSTkdpQnFNa2pvY0hydjI0NU1hQm9zSUNJUHAxX2U2TEhFbXBidGlxdUFaWmtLd1hpal9vNzVnd3ZBZGpfUnFjS193VmpnSWRJVnhXRzVBb1ZEMV9QUkNtTklzUFVyRVZfc2ZmMFZITkVHYnVPVGgxcGJSckRrcF9hbGx3cEJXTElVSGt4S1RXMEpkeS1wdS1xeDlweVBvQ2hhQURjZXBwUFlQaXdVTmZxSUlSVmJ5SVlQYm0zUmpqM2JlSGw1N08yZGphcGYyZGFMUVJ1bGt1NEQxT2JIbG5sTGhvZ3VuSXJzTHB2YlBLMGliNnNtQm0wMVBuejVBZXdBN0hDMjBHdThwZVk0THdJYzVnYVlZWjZNdnJtakl2MTdJLWFXTGU3M3E3eDk3NHZGZ2JKV0lNMUZGVko0SURhQl93M19zVjN3In0sImlhdCI6MTU5Njg4MzgzM30.i3VDyCnqpsDZgsQS_9O9VuZm6IKbALqKzuofBaLD1cg",
       imageDefault:
         "https://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png",
       fullName: "",
@@ -367,31 +317,15 @@ export default {
       search: "",
       isShowModalProduct: false,
       isShowModalNote: false,
-      isConfig: false,
-      checkIdAndSecret: true,
-      checkStoreAndRetailer: false,
     };
   },
   created() {
     this.partnerAuthenticate();
     this.getCity();
-    this.getBranch();
     this.getCart();
   },
   mounted() {},
   computed: {
-    checkModal() {
-      if (
-        localStorage.getItem("store_id") &&
-        localStorage.getItem("client_id") &&
-        localStorage.getItem("client_secret")
-      ) {
-        this.isConfig = true;
-      } else {
-        this.isConfig = false;
-      }
-      return this.isConfig;
-    },
     //tìm kiếm sp
     filteredList() {
       return this.listProduct.filter((product) => {
@@ -419,6 +353,24 @@ export default {
     },
   },
   methods: {
+    // xác thực
+    async runOAuth() {
+      try {
+        let body = {
+          _type: "oauth-access-token",
+          access_token: this.access_token,
+          token_partner: this.accessTokenKiotviet,
+        };
+        let Oauth = await Restful.post(
+          `${APIBase}/v1/app/app-installed/update`,
+          body
+        );
+        this.isOAuth = true;
+        window.close();
+      } catch (e) {
+        console.log(e);
+      }
+    },
     async partnerAuthenticate() {
       try {
         let body = {
@@ -429,129 +381,29 @@ export default {
           `${APIBase}/v1/service/partner-authenticate`,
           body
         );
-        if (
-          get_customer_info.data.succes &&
-          get_customer_info.data.code == 200
-        ) {
-          this.isOAuth = true;
-          this.fullName =
-            get_customer_info.data.data.public_profile.client_name;
+        this.isOAuth = true;
+        this.token_partner =
+          get_customer_info.data.data.public_profile.token_partner;
+        localStorage.setItem('token_partner' , this.token_partner);
+        if (this.token_partner) {
+          
+          this.getBranch();
         }
+
+        this.fullName = get_customer_info.data.data.public_profile.client_name;
       } catch (error) {
         this.isOAuth = false;
         console.log("info err", error);
       }
     },
-    // lấy accessTokenKioviet
-    async getAccessToken() {
-      if (!this.clientId) {
-        Toast.fire({
-          icon: "error",
-          title: `Client Id chưa nhập thông tin`,
-        });
-      } else if (!this.clientSecret) {
-        Toast.fire({
-          icon: "error",
-          title: `Client Secret chưa nhập thông tin`,
-        });
-      } else {
-        let params = {
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
-        };
-        try {
-          let accessToken = await Restful.get(
-            `${host}/selling-page/other/kiotviet_access_token`,
-            params
-          );
-          this.accessTokenKiotviet = accessToken.data.data.access_token;
-          localStorage.setItem("client_id", this.clientId);
-          localStorage.setItem("client_secret", this.clientSecret);
-          localStorage.setItem(
-            "access_token_kiotviet",
-            accessToken.data.data.access_token
-          );
-          this.checkIdAndSecret = false;
-          this.checkStoreAndRetailer = true;
-          Toast.fire({
-            icon: "success",
-            title: "Thành công",
-          });
-        } catch (err) {
-          console.log(err);
-          Toast.fire({
-            icon: "error",
-            title: "Vui lòng thử lại",
-          });
-        }
-      }
-    },
-    // đồng bộ sản phẩm với store
-    async syncProduct() {
-      if (!this.storeId) {
-        Toast.fire({
-          icon: "error",
-          title: `Store Id chưa nhập thông tin`,
-        });
-      } else if (!this.retailer) {
-        Toast.fire({
-          icon: "error",
-          title: `Retailer chưa nhập thông tin`,
-        });
-      } else {
-        let params = {
-          store_id: this.storeId,
-          Retailer: this.retailer,
-          Authorization: localStorage.getItem("access_token_kiotviet"),
-        };
-        try {
-          let syncProduct = Restful.get(
-            `${host}/selling-page/product/sync_product_kiotviet`,
-            params
-          );
-          localStorage.setItem("store_id", this.storeId);
-          localStorage.setItem("retailer", this.retailer);
-          Toast.fire({
-            icon: "success",
-            title: "Thành công",
-          });
-          this.checkStoreAndRetailer = false;
-        } catch (err) {
-          console.log(err);
-          Toast.fire({
-            icon: "error",
-            title: "Vui lòng thử lại",
-          });
-        }
-      }
-    },
-    // xác thực
-    async runOAuth() {
-      try {
-        let body = {
-          _type: "oauth-access-token",
-          access_token: this.access_token,
-          token_partner: "active",
-        };
-        let Oauth = await Restful.post(
-          `${APIBase}/v1/app/app-installed/update`,
-          body
-        );
-        if (Oauth) {
-          this.isOAuth = true;
-          window.close();
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
+
     //lấy chi nhánh
     async getBranch() {
-      let params = {
-        Retailer: localStorage.getItem("retailer"),
-        Authorization: localStorage.getItem("access_token_kiotviet"),
-      };
       try {
+        let params = {
+          // access_token: this.accessTokenKiotviet,
+          access_token: this.token_partner,
+        };
         let branch = await Restful.get(
           `${host}/selling-page/other/kiotviet_get_branch`,
           params
@@ -574,10 +426,10 @@ export default {
     },
     //lấy dữ liệu quận/huyện
     async getDistrict() {
-      let params = {
-        matinh: this.city.code,
-      };
       try {
+        let params = {
+          matinh: this.city.code,
+        };
         let city = await Restful.get(
           `${host}/delivery/subvn/thongtin/quanhuyen`,
           params
@@ -589,10 +441,10 @@ export default {
     },
     // lấy dữ liệu xã/phường
     async getWard() {
-      let params = {
-        mahuyen: this.district.code,
-      };
       try {
+        let params = {
+          mahuyen: this.district.code,
+        };
         let district = await Restful.get(
           `${host}/delivery/subvn/thongtin/xaphuonghuyen`,
           params
@@ -614,10 +466,10 @@ export default {
     },
     // lấy tất cả sp
     async getProductCart() {
-      let params = {
-        store_id: this.storeId,
-      };
       try {
+        let params = {
+          access_token: localStorage.getItem("token_partner"),
+        };
         let getProduct = await Restful.get(
           `${host}/selling-page/product/product_read`,
           params
@@ -629,20 +481,28 @@ export default {
     },
     // thêm sản phẩm vào giỏ hàng
     async addProductForCart(item) {
-      let body = {
-        store_id: this.storeId,
-        product_id: item.product_id,
-        client_id: localStorage.getItem("client_id"),
-        product_price: item.product_price,
-        product_quantity: 1,
-        product_name: item.product_name,
-        other_info: item.image,
-      };
+      let client_id = localStorage.getItem("client_id");
+      if (!client_id) {
+        this.clientId = "";
+      } else {
+        this.clientId = client_id;
+      }
       try {
+        let body = {
+          access_token: localStorage.getItem("token_partner"),
+          product_id: item.product_id,
+          product_price: item.product_price,
+          product_quantity: 1,
+          product_name: item.product_name,
+          other_info: item.image,
+          client_id: this.clientId,
+        };
         let addCart = await Restful.post(
           `${host}/selling-page/cart/cart_add_product`,
           body
         );
+        this.clientId = addCart.data.data.client_id;
+        localStorage.setItem("client_id", this.clientId);
         Toast.fire({
           icon: "success",
           title: "Đã thêm vào giỏ hàng",
@@ -661,14 +521,15 @@ export default {
     },
     // lấy dữ liệu giỏ hàng
     async getCart() {
-      let body = {
-        client_id: localStorage.getItem("client_id"),
-        sort: "createdAt ASC",
-      };
       try {
-        let getCart = await Restful.post(
+        let params = {
+          access_token: localStorage.getItem("token_partner"),
+          client_id: localStorage.getItem("client_id"),
+          sort: "createdAt ASC",
+        };
+        let getCart = await Restful.get(
           `${host}/selling-page/cart/cart_read`,
-          body
+          params
         );
         this.cart = getCart.data.data;
       } catch (err) {
@@ -677,12 +538,12 @@ export default {
     },
     //tăng số lượng trong giỏ hàng
     async handleAddCart(id) {
-      let body = {
-        store_id: this.storeId,
-        product_id: id,
-        client_id: localStorage.getItem("client_id"),
-      };
       try {
+        let body = {
+          access_token: localStorage.getItem("token_partner"),
+          product_id: id,
+          client_id: localStorage.getItem('client_id'),
+        };
         let add = await axios.post(
           `${host}/selling-page/cart/cart_add_product`,
           body
@@ -694,12 +555,12 @@ export default {
     },
     //giảm số lượng trong giỏ hàng
     async handleSubCart(id) {
-      let body = {
-        store_id: this.storeId,
-        product_id: id,
-        client_id: localStorage.getItem("client_id"),
-      };
       try {
+        let body = {
+          access_token: localStorage.getItem("token_partner"),
+          product_id: id,
+          client_id: localStorage.getItem('client_id'),
+        };
         let sub = await Restful.post(
           `${host}/selling-page/cart/cart_sub_product`,
           body
@@ -711,23 +572,27 @@ export default {
     },
     //xóa 1 sp trong giỏ hàng
     async handleDeleteItemCart(id) {
-      let body = {
-        store_id: this.storeId,
-        product_id: id,
-        client_id: localStorage.getItem("client_id"),
-      };
-      let deleteItem = await Restful.post(
-        `${host}/selling-page/cart/cart_delete_product`,
-        body
-      );
-      this.getCart();
+      try {
+        let body = {
+          access_token: localStorage.getItem("token_partner"),
+          product_id: id,
+          client_id: localStorage.getItem('client_id'),
+        };
+        let deleteItem = await Restful.post(
+          `${host}/selling-page/cart/cart_delete_product`,
+          body
+        );
+        this.getCart();
+      } catch (err) {
+        console.log(err);
+      }
     },
     async deleteAllCart() {
-      let body = {
-        store_id: this.storeId,
-        client_id: localStorage.getItem("client_id"),
-      };
       try {
+        let body = {
+          access_token: localStorage.getItem("token_partner"),
+          client_id: localStorage.getItem('client_id'),
+        };
         let deleteCart = await Restful.post(
           `${host}/selling-page/cart/cart_delete`,
           body
@@ -738,28 +603,6 @@ export default {
       }
     },
     async createBill() {
-      let address =
-        this.address +
-        " " +
-        this.ward +
-        " " +
-        this.district.name +
-        " " +
-        this.city.name;
-      let body = {
-        store_id: this.storeId,
-        branchId: this.branchId,
-        product_info: this.cart,
-        customer_name: this.fullName,
-        customer_phone: this.phoneNumber,
-        customer_address: address,
-        customer_city_name: this.city.name,
-        customer_district_name: this.district.name,
-        note: this.note,
-        Retailer: localStorage.getItem("retailer"),
-        Authorization: localStorage.getItem("access_token_kiotviet"),
-        // platform_type: "kiotviet",
-      };
       if (!this.fullName) {
         Toast.fire({
           icon: "error",
@@ -802,8 +645,28 @@ export default {
         });
       } else {
         try {
+          let address =
+            this.address +
+            " " +
+            this.ward +
+            " " +
+            this.district.name +
+            " " +
+            this.city.name;
+          let body = {
+            branchId: this.branchId,
+            product_info: this.cart,
+            customer_name: this.fullName,
+            customer_phone: this.phoneNumber,
+            customer_address: address,
+            customer_city_name: this.city.name,
+            customer_district_name: this.district.name,
+            note: this.note,
+            access_token: localStorage.getItem("token_partner"),
+            // platform_type: "kiotviet",
+          };
           let createBill = await Restful.post(
-            `${host}/selling-page/order/order_kiotviet`,
+            `${host}/selling-page/order/order_create_3rd`,
             body
           );
           this.phoneNumber = "";
@@ -826,16 +689,6 @@ export default {
         }
       }
     },
-    reConfig() {
-      localStorage.removeItem("client_id");
-      localStorage.removeItem("client_secret");
-      localStorage.removeItem("access_token_kiotviet");
-      localStorage.removeItem("store_id");
-      localStorage.removeItem("retailer");
-      this.isConfig = false;
-      this.checkIdAndSecret = true;
-      this.checkStoreAndRetailer = false;
-    },
   },
 };
 </script>
@@ -846,10 +699,14 @@ body {
   margin: 0;
   overflow-x: hidden;
   font-size: 13px;
-  .btn-auth {
-    position: absolute;
-    top: 50%;
-    left: 40%;
+  .auth {
+    label {
+      font-size: 15px;
+    }
+    button {
+      margin-top: 5px;
+      padding: auto 20px;
+    }
   }
   .content {
     .header {
@@ -995,56 +852,6 @@ body {
       }
       .bill-right {
         text-align: right;
-      }
-    }
-  }
-  .modal-get-info {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    .form-get-info {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      input {
-        display: block;
-        margin: 5px 0;
-      }
-      button {
-        background-color: blue;
-        color: #fff;
-        cursor: pointer;
-        border: none;
-      }
-    }
-  }
-  .modal-form-sync-product {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    .form-sync-product {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      input {
-        display: block;
-        margin: 5px 0;
-      }
-      button {
-        background-color: blue;
-        color: #fff;
-        cursor: pointer;
-        border: none;
       }
     }
   }

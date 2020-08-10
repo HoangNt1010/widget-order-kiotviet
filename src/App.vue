@@ -302,7 +302,7 @@ export default {
       city: "",
       district: "",
       ward: "",
-      branchId: "",
+      branchId: "1",
       listBranch: [],
       listCountry: [],
       listCity: [],
@@ -384,19 +384,16 @@ export default {
         this.isOAuth = true;
         this.token_partner =
           get_customer_info.data.data.public_profile.token_partner;
-        localStorage.setItem('token_partner' , this.token_partner);
+        localStorage.setItem("token_partner", this.token_partner);
         if (this.token_partner) {
-          
           this.getBranch();
         }
-
         this.fullName = get_customer_info.data.data.public_profile.client_name;
       } catch (error) {
         this.isOAuth = false;
         console.log("info err", error);
       }
     },
-
     //lấy chi nhánh
     async getBranch() {
       try {
@@ -542,7 +539,7 @@ export default {
         let body = {
           access_token: localStorage.getItem("token_partner"),
           product_id: id,
-          client_id: localStorage.getItem('client_id'),
+          client_id: localStorage.getItem("client_id"),
         };
         let add = await axios.post(
           `${host}/selling-page/cart/cart_add_product`,
@@ -559,7 +556,7 @@ export default {
         let body = {
           access_token: localStorage.getItem("token_partner"),
           product_id: id,
-          client_id: localStorage.getItem('client_id'),
+          client_id: localStorage.getItem("client_id"),
         };
         let sub = await Restful.post(
           `${host}/selling-page/cart/cart_sub_product`,
@@ -576,7 +573,7 @@ export default {
         let body = {
           access_token: localStorage.getItem("token_partner"),
           product_id: id,
-          client_id: localStorage.getItem('client_id'),
+          client_id: localStorage.getItem("client_id"),
         };
         let deleteItem = await Restful.post(
           `${host}/selling-page/cart/cart_delete_product`,
@@ -587,11 +584,12 @@ export default {
         console.log(err);
       }
     },
+    //xóa toàn bộ giỏ hàng
     async deleteAllCart() {
       try {
         let body = {
           access_token: localStorage.getItem("token_partner"),
-          client_id: localStorage.getItem('client_id'),
+          client_id: localStorage.getItem("client_id"),
         };
         let deleteCart = await Restful.post(
           `${host}/selling-page/cart/cart_delete`,
@@ -602,6 +600,7 @@ export default {
         console.log(err);
       }
     },
+    //tạo đơn hàng
     async createBill() {
       if (!this.fullName) {
         Toast.fire({
@@ -855,5 +854,8 @@ body {
       }
     }
   }
+}
+body::-webkit-scrollbar {
+  display: none;
 }
 </style>
